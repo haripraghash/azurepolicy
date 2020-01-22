@@ -30,7 +30,7 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: Management Group
-        azureResourceManagerConnection: "policy-deploy"
+        azureResourceManagerConnection: "policy-deploy1"
         location: North Europe
         templateLocation: Linked artifact
         managementGroupId: nonprod-managementgroup
