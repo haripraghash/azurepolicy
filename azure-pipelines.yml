@@ -2,18 +2,38 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(date:yyyyMMdd)$(rev:.r)
 
 trigger:
-- master
+  branches:
+    include:
+    - '*'
 
-pool:
-  vmImage: 'ubuntu-latest'
+variables:
+- name: BuildPlatform
+  value:  'any cpu'
+- name: BuildConfiguration
+  value: 'release'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: create_policies
+  displayName: 'Create the policies'
+  #condition: and(always(), eq(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - job: create_policies_on_azure
+    #variables:
+    #- group: feature-simplehttpapiapp
+    displayName: 'Job: Create policies on Azure'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: Management Group
+        azureResourceManagerConnection: "policy-deploy"
+        location: North Europe
+        templateLocation: Linked artifact
+        managementGroupId: nonprod-managementgroup
+        csmFile: $(System.DefaultWorkingDirectory)/policies/webappskus/policydef.json
+        deploymentMode: 'Incremental'
+      displayName: 'Create Policy Definition'
