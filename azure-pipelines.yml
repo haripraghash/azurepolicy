@@ -33,7 +33,6 @@ stages:
         azureResourceManagerConnection: "policy-deploy1"
         location: North Europe
         templateLocation: Linked artifact
-        managementGroupId: nonprod-managementgroup
         csmFile: $(System.DefaultWorkingDirectory)/policies/webappskus/policydef.json
         deploymentMode: 'Incremental'
       displayName: 'Create Policy Definition'
